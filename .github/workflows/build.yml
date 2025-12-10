@@ -154,8 +154,13 @@ jobs:
       - name: Generate application icon
         if: startsWith(github.ref, 'refs/tags/') && matrix.enable_gui == true
         run: |
-          python3 generate_icon.py
-          ls -lh app_icon.* 2>/dev/null || echo "Icon files generated"
+          # 检查是否有 PyQt5（Linux 软路由版本可能没有）
+          if python3 -c "import PyQt5.QtWidgets" 2>/dev/null; then
+            python3 generate_icon.py
+            ls -lh app_icon.* 2>/dev/null || echo "Icon generation completed"
+          else
+            echo "PyQt5 not available, skipping icon generation (no GUI environment)"
+          fi
         shell: bash
 
       - name: Build Python executable
